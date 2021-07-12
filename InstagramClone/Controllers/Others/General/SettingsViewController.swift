@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SafariServices
 
 struct SettingCellModel {
     let title: String
@@ -46,13 +47,72 @@ class SettingsViewController: UIViewController {
     
 
     private func configureModels() {
-        let section = [
+        data.append([
+            SettingCellModel(title: "Profili Düzenle") { [weak self] in
+                self?.didTapEditProfile()
+            },
+            SettingCellModel(title: "Arkadaşlarını Davet Et") { [weak self] in
+                self?.didTapInviteFriends()
+            },
+            SettingCellModel(title: "Gönderileri Kaydet") { [weak self] in
+                self?.didTapSaveOriginalPosts()
+            }
+        ])
+        
+        data.append([
+            SettingCellModel(title: "Kullanım Koşulları") { [weak self] in
+                self?.openURL(type: .terms)
+            },
+            SettingCellModel(title: "Gizlilik Politikası") { [weak self] in
+                self?.openURL(type: .privacy)
+            },
+            SettingCellModel(title: "Yardım / Geri Bildirim") { [weak self] in
+                self?.openURL(type: .help)
+            }
+        ])
+        
+        data.append([
             SettingCellModel(title: "Çıkış Yap") { [weak self] in
                 self?.didTapLogOut()
             }
-        ]
+        ])
+    }
+    
+    enum SettingsURLType {
+        case terms, privacy, help
+    }
+    
+    private func openURL(type: SettingsURLType) {
+        let urlString: String
         
-        data.append(section)
+        switch type {
+        case .terms: urlString = "https://help.instagram.com/581066165581870"
+        case .privacy: urlString = "https://help.instagram.com/519522125107875"
+        case .help: urlString = "https://help.instagram.com"
+        }
+        
+        guard let url = URL(string: urlString) else {
+            return
+        }
+        
+        let vc = SFSafariViewController(url: url)
+        present(vc, animated: true)
+    }
+    
+    private func didTapSaveOriginalPosts() {
+        
+    }
+    
+    private func didTapInviteFriends() {
+        
+    }
+    
+    private func didTapEditProfile() {
+        let vc = EditProfileViewController()
+        vc.title = "Profili Düzenle"
+        let navVC = UINavigationController(rootViewController: vc)
+        navVC.modalPresentationStyle = .fullScreen
+        present(navVC, animated: true)
     }
     
     private func didTapLogOut(){
@@ -96,6 +156,7 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.textLabel?.text = data[indexPath.section][indexPath.row].title
+        cell.accessoryType = .disclosureIndicator
         return cell
     }
     
